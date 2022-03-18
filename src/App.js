@@ -10,6 +10,7 @@ import About from "./pages/About";
 import { FeedbackProvider } from "./components/context/FeedbackContext";
 
 function App() {
+  // this is real code with changes made
   return (
     <FeedbackProvider>
       <Router>
