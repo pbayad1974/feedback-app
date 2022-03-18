@@ -1,0 +1,202 @@
+Components
+Props
+State
+Events
+Context
+
+*** General
+    Anything in {} is JS
+
+    Conditional rendering: {showComments && <div>Hi</div>} // If showComments is true then display the div
+    Like ternary operator but not using null for false condition
+
+    react-icons library
+    import {FaTimes} from 'react-icons/fa' // From font awesome import icon names FaTimes
+    <FaTimes color="purple"/> // Takes the color argument
+
+    To limit the decimal places to a certain digit use .toFixed(2) where 2 is number of decimal places
+    eg: average is a variable having number
+    average.toFixed(1).replace(/[.,]0$/, '') // limits to 1 decimal place & replace trailing 0 like 8.0 will be 8
+    Math.round // rounds off the number but we just want to cut decimals so toFixed
+
+    You may have form button disabled using some condition but client side can change that
+    So also add condition in function that handles onSubmit for form
+
+    npm i uuid to have unique id for arrays or objects
+    import { v4 as uuidv4 } from "uuid";
+
+*** Props
+    Pass props to components from main and destructure it in component's JS file or access using props.
+
+    props.children is a prop type of node
+    Booleans are of prop type bool
+
+    import PropTypes from 'prop-types'
+
+    ComponentName.defaultProps = {
+        myprop: 'default value'
+    }
+
+    ComponentName.propTypes = {
+        children: PropTypes.node.isRequired,
+        reverse: PropTypes.bool
+    }
+
+    Can do PropTypes of array or define what kind of array you want using PropTypes.shape()
+
+    FeedbackList.propTypes = {
+    feedback: PropTypes.arrayOf(
+        PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        text: PropTypes.string.isRequired,
+        rating: PropTypes.number.isRequired,
+        })
+    ),
+    };
+
+*** State
+    import {useState} from 'react'
+
+    const [varname, setVarname] = useState('default values')
+    return <div>{varname}</div>
+
+    setVarname('new text') // call the function to update state
+    Do it as arrow function if you want to access previous state
+
+    setVarname((prev)=> {return prev + 1})
+
+    You CAN'T push objects or array to a set, you have to create a new one
+    Eg: const [feedback, setFeedback] = useState(FeedbackData); // FeedbackData is js file with array
+    setFeedback([...newFeedback, ...feedback]) // newFeedback is new object in array put at top
+
+    // This below code will NOT work, previous state use only for calcs mostly
+    setFeedback((prevState)=> prevState, newFeedback)
+
+*** React Router
+    https://stackoverflow.com/a/69880162/14259996
+    
+    ** General usage
+        import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+
+        Enclose App function return component <Router>
+        In that, each path should be:
+        <Route path="/" element={<><myComp1 /> <myComp2/></>} />
+
+        Keep container width div & header component inside <Router> But out of individual <Route> because all pages have that common
+
+    ** Link & NavLink additional options
+        Don't use a href, use Link to; import in any jsx that has links
+        import { Link } from 'react-router-dom'
+
+        <Link to="/about">
+            <FaQuestion size={30} />
+        </Link>
+
+        More options for Link, hash, query parameters
+
+        <Link to={{
+            pathname: '/about',
+            search: '?sort=name',
+            hash: '#brand-section'
+        }}>
+            <FaQuestion size={30} />
+        </Link>
+
+        NavLink just adds a class to itself based on if its active selected or not
+        Add css for class set in activeClassName
+        import { NavLink } from 'react-router-dom'
+        <NavLink to='/' activeClassName='active' > Home </NavLink>
+
+    Taking URL Parameters and Redirecting Links for 404 or resources
+        For urls with parameters like post id or title in url, use : colon symbol before that variable
+        <Route path='/post/:id/:name' element={<Post />} />
+
+        import {useParams} from 'react-router-dom'
+
+        inside the function of that post file
+        const params = useParams()
+
+        Then in return block, inside divs, to get the id
+        {params.id} // This comes from the url in which added :id Route path
+
+        import {Navigate, useNavigate} from 'react-router-dom'
+        const status =404
+        if (status===404) {return <Navigate to='/notfound' />}
+
+        const navigate = useNavigate()
+        <button onClick={navigate('/about')} > Click </button>
+
+        Have * symbol in path when you want something to be there like
+        path='/post/*' // will display only if theres something after post/
+
+*** Context
+    1st createContext() assigned to a const named FeedbackContext here
+    then another const that returns FeedbackContext.Provider component with {children} inside
+    FeedbackContext.Provider takes value param value={{feedback}} which takes states as object
+    export default FeedbackContext
+    Wrap App.js return statement in provider component i.e., FeedbackProvider
+    ** Example
+        import { createContext, useState } from "react";
+
+        const FeedbackContext = createContext();
+
+        export const FeedbackProvider = ({ children }) => {
+        const [feedback, setFeedback] = useState([
+            { id: 1, text: "my context review 1", rating: 8 },
+        ]);
+        return (
+            <FeedbackContext.Provider
+            value={{
+                feedback,
+            }}
+            >
+            {children}
+            </FeedbackContext.Provider>
+        );
+        };
+
+    In the file you want to use context
+        import { useContext } from "react";
+        import FeedbackContext from "./context/FeedbackContext";
+
+        Extract the state passed in value={{}} attribute of FeedbackProvider & give it context to use
+        const {feedback} = useContext(FeedbackContext)
+
+        Then no need to use propType checking as its a state now instead of prop
+
+    Just like you pass state in value={{}} attribute of the Provider, pass functions as well
+    Define functions inside the context file and pass it in value
+
+    Tip: Import it in the file  where the prop drilling ends i.e., where it isn't further passed down
+    Like here, deleteFeedback is inside FeedbackItem & not the list or app.js
+
+*** useEffect hook, do something whenver something specified changes like state
+    import {useEffect} from 'react'
+
+    Inside the function component
+    useEffect(() => {console.log('hello')}, [])
+
+    Arrow function is what will happen
+    Everything after }, is telling when to happen
+    [] means do this on page load, like when doing fetch requests
+    [feedbackEdit] means whenever a state named 'feedbackEdit' changes
+
+** Updating item using state feedback
+  const updateFeedback = (id, updItem) => {
+    setFeedback(
+      feedback.map((item) => (item.id === id ? { ...item, ...updItem } : item))
+    );
+  };
+
+  1st map through the list, if any objects id matches the id of the editing feedback,
+  spread all the original item, spread updItem AFTER the original ones because newer will overwrite existing
+  if it doesn't match, keep the item as it is
+
+*** Deploying
+    Github, vercel, netlify, Amazon ews
+
+    npm run build // Builds for production ready
+    npm i -g serve // Can view build project website at fixed path localhost
+    serve -s build // Just like npm start, but for running production build
+
+
