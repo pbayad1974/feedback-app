@@ -27,6 +27,9 @@ Context
     npm i uuid to have unique id for arrays or objects
     import { v4 as uuidv4 } from "uuid";
 
+    Have file extension if importing gif or other file
+    import spinner from '../assets/spinner.gif
+
 *** Props
     Pass props to components from main and destructure it in component's JS file or access using props.
 
@@ -201,4 +204,30 @@ Context
     npm i -g serve // Can view build project website at fixed path localhost
     serve -s build // Just like npm start, but for running production build
 
+    Open netlify account, import a new site, select the Github Repo
 
+*** Mock Backend & Server imp
+    // using json server
+    Use npm i json-server npm package, create a db.json file
+    In package.json, in scripts object
+    "server": "json-server --watch db.json --port 5000"
+    npm run server // To start the server
+
+    You can then make get,post,put,delete requests using axios, fetch, thunderclient
+    Put is to update the item in full; Patch allows partial update
+
+    Use npm i concurrently // to run 2 commands at once
+    In package.json, in scripts object
+    "dev": "concurrently \"npm run server\" \"npm start\""
+    npm run dev
+
+    // Instead of typing localhost:5000 everytime for making request, just do this
+    In package.json, in main object just below private, add
+    "proxy": "http://localhost:5000", //without forward slash
+    Then when making fetch requests, just start with /feedback/1 (/ & path)
+    Restart server after making change
+    When deploying just change url to backend server at 1 place in package json instead of every instance
+
+    After installing json-server, setting proxy, use fetch to request data from localhost server
+    Set the state as that using useEffect with [] means fetch data on load
+    Then use its get, post, put methods to update
